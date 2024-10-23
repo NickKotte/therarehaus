@@ -1,23 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Marcellus, Montserrat } from 'next/font/google';
 import { Navigation } from './components/Navigation';
 import { FloatingDots } from './components/FloatingDots';
 import { BackgroundProvider } from './components/BackgroundProvider';
 import { ScrollToTop } from './components/ScrollToTop';
-
-const marcellus = Marcellus({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-marcellus',
-  display: 'swap',
-});
-
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  variable: '--font-montserrat',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: {
@@ -66,7 +52,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${marcellus.variable} ${montserrat.variable} font-sans text-white bg-zinc-900 relative`}>
+      <head>
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body suppressHydrationWarning className="font-sans text-white bg-zinc-900 relative" style={{
+        fontFamily: "'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+      }}>
         <BackgroundProvider />
         <FloatingDots />
         <Navigation />
