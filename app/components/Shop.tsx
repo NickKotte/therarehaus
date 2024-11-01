@@ -1,11 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { MapPin, ShoppingBag, Filter } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
+import { GridItem } from './GridItem';
 import {
   Sheet,
   SheetContent,
@@ -66,9 +66,9 @@ export function Shop() {
 
   return (
     <section className="text-black">
-      <div className="container mx-auto px-4 py-32">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex gap-2">
+      <div className="container mx-auto px-4 py-20 md:py-32">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
               <Button
                 key={category}
@@ -96,7 +96,7 @@ export function Shop() {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent>
+            <SheetContent side="right" className="w-full sm:w-[400px]">
               <SheetHeader>
                 <SheetTitle>Shopping Cart</SheetTitle>
               </SheetHeader>
@@ -113,6 +113,7 @@ export function Shop() {
                           src={item.image}
                           alt={item.title}
                           className="w-16 h-16 object-cover rounded-md"
+                          draggable={false}
                         />
                         <div className="flex-1">
                           <h4 className="text-sm font-medium">{item.title}</h4>
@@ -164,46 +165,27 @@ export function Shop() {
           </Sheet>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredProducts.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: index * 0.1,
-              }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true, margin: '-100px' }}
-              className="group"
             >
-              <Link
+              <GridItem
+                item={{
+                  id: product.id,
+                  images: [product.image],
+                  title: product.title,
+                  location: product.location,
+                  subtitle: product.price,
+                }}
+                index={index}
                 href={`/shop/${product.id}`}
-                className="block relative overflow-hidden rounded-lg aspect-[3/4]"
-              >
-                <div className="absolute inset-0 w-full h-full overflow-hidden">
-                  <motion.div
-                    className="relative w-full h-full transform-gpu"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </motion.div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h2 className="text-lg font-semibold">{product.title}</h2>
-                  <p className="text-sm text-white/80">{product.price}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <MapPin className="w-3 h-3" />
-                    <span className="text-xs">{product.location}</span>
-                  </div>
-                </div>
-              </Link>
+                showOverlayOnScroll={true}
+              />
             </motion.div>
           ))}
         </div>

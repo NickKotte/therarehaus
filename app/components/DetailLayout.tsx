@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useAnimation, PanInfo } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,7 @@ interface DetailLayoutProps {
 export function DetailLayout({ images, backLink, backText, children }: DetailLayoutProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const router = useRouter();
+  const controls = useAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -31,6 +32,18 @@ export function DetailLayout({ images, backLink, backText, children }: DetailLay
     setCurrentImageIndex((prev) => 
       prev === 0 ? images.length - 1 : prev - 1
     );
+  };
+
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const SWIPE_THRESHOLD = 50;
+    if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
+      if (info.offset.x > 0) {
+        previousImage();
+      } else {
+        nextImage();
+      }
+    }
+    controls.start({ x: 0 });
   };
 
   return (
@@ -49,31 +62,39 @@ export function DetailLayout({ images, backLink, backText, children }: DetailLay
       />
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-32 relative z-10">
+      <div className="container mx-auto px-4 py-20 md:py-32 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12"
+          className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12"
         >
-          <div className="relative aspect-square rounded-lg overflow-hidden shadow-2xl">
-            <div className="absolute inset-0">
+          <div className="relative aspect-square rounded-lg overflow-hidden shadow-2xl touch-none">
+            <motion.div 
+              className="absolute inset-0"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              animate={controls}
+              onDragEnd={handleDragEnd}
+            >
               <motion.img
                 key={currentImageIndex}
                 src={images[currentImageIndex]}
                 alt={`Image ${currentImageIndex + 1}`}
                 className="w-full h-full object-cover"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, x: 0 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
+                draggable={false}
               />
-            </div>
+            </motion.div>
 
             {images.length > 1 && (
               <>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white md:flex hidden"
                   onClick={previousImage}
                   aria-label="Previous image"
                 >
@@ -82,7 +103,7 @@ export function DetailLayout({ images, backLink, backText, children }: DetailLay
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white md:flex hidden"
                   onClick={nextImage}
                   aria-label="Next image"
                 >
@@ -106,7 +127,7 @@ export function DetailLayout({ images, backLink, backText, children }: DetailLay
             )}
           </div>
 
-          <div className="space-y-6 bg-black/40 backdrop-blur-sm rounded-lg p-8">
+          <div className="space-y-6 bg-black/40 backdrop-blur-sm rounded-lg p-4 md:p-8">
             <Button
               variant="ghost"
               size="sm"
